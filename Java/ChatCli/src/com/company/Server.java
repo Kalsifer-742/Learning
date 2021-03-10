@@ -4,22 +4,24 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class Server extends Thread {
     DatagramSocket socket;
     DatagramPacket answer, request;
-    byte[] buffer;
+    ByteBuffer buffer;
+    final int bufferSize = Character.BYTES * 128;
     ArrayList<Client> clients;
 
     public Server(int port) throws SocketException {
         socket = new DatagramSocket(port);
-        buffer = new byte[2048];
+        buffer = ByteBuffer.allocate(bufferSize);
         clients = new ArrayList<>();
     }
 
     public void run() {
-        request = new DatagramPacket(buffer, buffer.length);
+        request = new DatagramPacket(buffer.array(), buffer.array().length);
         boolean newClient;
         while(!Thread.interrupted()) {
             try {

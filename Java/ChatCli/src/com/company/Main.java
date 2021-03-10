@@ -1,6 +1,7 @@
 package com.company;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Main {
@@ -24,14 +25,14 @@ public class Main {
                 System.out.print("Specify server port: ");
                 inputString = scanner.nextLine();
 
-                ClientApp clientApp = new ClientApp(serverAddress, Integer.parseInt(inputString));
+                ClientApp clientApp = new ClientApp(serverAddress, Integer.parseInt(inputString), "Bruco".getBytes(StandardCharsets.UTF_8));
                 clientApp.start();
                 System.out.println("Client started on address " + serverAddress + " & on port " + inputString + " ...");
 
                 System.out.println("Insert message to send...");
                 while (true) {
                     inputString = scanner.nextLine();
-                    clientApp.Send(inputString);
+                    clientApp.Send(inputString.getBytes(StandardCharsets.UTF_8));
                 }
             }
         }
