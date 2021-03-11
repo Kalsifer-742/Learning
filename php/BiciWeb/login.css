@@ -1,0 +1,21 @@
+#root {
+  width: 20vw;
+  height: 60vh;
+  background-color: grey;
+  margin-left: 40vw;
+  margin-top: 20vh;
+}
+#username,
+#password {
+  margin-top: 1vh;
+  font-size: large;
+  text-align: center;
+}
+#button {
+  text-align: center;
+  margin-top: 1vh;
+}
+#logo {
+  width: 20vw;
+  background-color: whitesmoke;
+}
