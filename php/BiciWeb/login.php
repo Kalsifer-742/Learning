@@ -10,8 +10,8 @@
 </head>
 <body>
     <div id="root">
-    <img src="https://www.searchpng.com/wp-content/uploads/2019/01/Bike-Logo-Design-PNG-1024x766.png" alt="Logo" id="logo">
-        <form method="post" action="auth.php">
+    <img src="logo.png" alt="Logo" id="logo">
+        <form method="post" action="r_auth.php">
             <div id="username">
                 <label>Username</label>
                 <input type="text" name="user">
@@ -24,7 +24,9 @@
                 <input type="submit" value="Accedi" id="submit">
             </div>
         </form>
+        <div id="button">
+            <button onClick="document.location.href = 'registration.php'">Registration</button>
+        </div>
     </div>
 </body>
-
 </html>
