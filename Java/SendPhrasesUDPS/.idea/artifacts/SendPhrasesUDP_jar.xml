@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="SendPhrasesUDP:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SendPhrasesUDP_jar</output-path>
+    <root id="archive" name="SendPhrasesUDP.jar">
+      <element id="module-output" name="SendPhrasesUDP" />
+    </root>
+  </artifact>
+</component>
