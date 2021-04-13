@@ -1,8 +1,8 @@
--- MariaDB dump 10.18  Distrib 10.4.17-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19  Distrib 10.4.18-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: bici
 -- ------------------------------------------------------
--- Server version	10.4.17-MariaDB
+-- Server version	10.4.18-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -23,9 +23,10 @@ DROP TABLE IF EXISTS `amministratori`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `amministratori` (
-  `username` varchar(16) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `password` char(255) NOT NULL,
-  PRIMARY KEY (`username`)
+  PRIMARY KEY (`user_id`),
+  CONSTRAINT `amministratori_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `utenti` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -35,7 +36,7 @@ CREATE TABLE `amministratori` (
 
 LOCK TABLES `amministratori` WRITE;
 /*!40000 ALTER TABLE `amministratori` DISABLE KEYS */;
-INSERT INTO `amministratori` VALUES ('edo','5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5'),('enrico','8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
+INSERT INTO `amministratori` VALUES (34,'d247d639bb24497742a70df7cfe235be35b463ec4e6924f8d04608ac276eb606');
 /*!40000 ALTER TABLE `amministratori` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -197,4 +198,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-02 19:52:23
+-- Dump completed on 2021-04-13 18:01:50
