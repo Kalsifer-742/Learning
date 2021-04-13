@@ -11,7 +11,7 @@
 <body>
     <div id="root">
     <img src="logo.png" alt="Logo" id="logo">
-        <form method="post" action="r_auth.php">
+        <form method="post" action="auth.php">
             <div id="username">
                 <label>Username</label>
                 <input type="text" name="user">
