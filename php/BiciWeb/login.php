@@ -25,7 +25,7 @@
             </div>
         </form>
         <div id="button">
-            <button onClick="document.location.href = 'registration.php'">Registration</button>
+            <button onClick="document.location.href = 'registration.php'">Registrazione</button>
         </div>
     </div>
 </body>
