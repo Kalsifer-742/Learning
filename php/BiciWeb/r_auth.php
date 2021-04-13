@@ -6,9 +6,10 @@
         header('Location: registration.php');
     }
 
-    $res = $sql_db->query('INSERT INTO utenti (id, nome, cognome, cap, indirizzo, num_carta_credito, cellulare, mail, data_nascita) VALUES ('.$_POST['name'].','.$_POST['surname'].','.$_POST['cap'].','.$_POST['address'].','.$_POST['nc'].','.$_POST['cell'].','.$_POST['b_date'].')"');   
+    //echo "INSERT INTO utenti (nome, cognome, cap, indirizzo, num_carta_credito, cellulare, mail, data_nascita) VALUES ('".$_POST['name']."','".$_POST['surname']."',".$_POST['cap'].",'".$_POST['address']."',".$_POST['nc'].",".$_POST['cell'].",'".$_POST['mail']."','".$_POST['b_date']."')";
+    
+    $res = $sql_db->query("INSERT INTO utenti (nome, cognome, cap, indirizzo, num_carta_credito, cellulare, mail, data_nascita) VALUES ('".$_POST['name']."','".$_POST['surname']."',".$_POST['cap'].",'".$_POST['address']."',".$_POST['nc'].",".$_POST['cell'].",'".$_POST['mail']."','".$_POST['b_date']."')");   
     
     header('Location: login.php');
-
     $sql_db -> close();
 ?>
