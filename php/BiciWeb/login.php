@@ -20,11 +20,11 @@
                 <label>Password</label>
                 <input type="text" name="password">
             </div>
-            <div id="button">
+            <div id="bt">
                 <input type="submit" value="Accedi" id="submit">
             </div>
         </form>
-        <div id="button">
+        <div id="bt">
             <button onClick="document.location.href = 'registration.php'">Registrazione</button>
         </div>
     </div>
