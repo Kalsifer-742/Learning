@@ -1,7 +1,23 @@
 <?php
     session_start();
+
     if(!isset($_SESSION["username"]) || !isset($_SESSION["password"])){
         header('Location: login.php');
+    }
+    else{
+        $sql_db = new mysqli("localhost", "root", "", "bici");
+
+        if ($sql_db->connect_errno) {
+            echo '<p>Failed to connect to MySQL: '.$sql_db->connect_error .'</p>';
+            header('Location: login.php');
+        }
+
+        $res = $sql_db->query('SELECT password FROM amministratori WHERE user_id ="'.$_SESSION["username"].'"');
+        $res = $res->fetch_assoc();
+        $sql_db -> close();
+        if(hash('sha256', $_SESSION["password"]) != $res['password']){
+            header('Location: login.php');
+        }
     }
 ?>
 <!DOCTYPE html>

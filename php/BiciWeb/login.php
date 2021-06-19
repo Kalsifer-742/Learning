@@ -11,7 +11,7 @@
 <body>
     <div id="root">
     <img src="logo.png" alt="Logo" id="logo">
-        <form method="post" action="r_auth.php">
+        <form method="post" action="auth.php">
             <div id="username">
                 <label>Username</label>
                 <input type="text" name="user">
@@ -20,12 +20,12 @@
                 <label>Password</label>
                 <input type="text" name="password">
             </div>
-            <div id="button">
+            <div id="bt">
                 <input type="submit" value="Accedi" id="submit">
             </div>
         </form>
-        <div id="button">
-            <button onClick="document.location.href = 'registration.php'">Registration</button>
+        <div id="bt">
+            <button onClick="document.location.href = 'registration.php'">Registrazione</button>
         </div>
     </div>
 </body>
