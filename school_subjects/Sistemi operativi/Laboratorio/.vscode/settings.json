@@ -3,6 +3,7 @@
         "chrono": "c",
         "functional": "c",
         "*.tcc": "c",
-        "fstream": "c"
+        "fstream": "c",
+        "random": "c"
     }
 }

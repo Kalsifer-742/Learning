@@ -6,21 +6,72 @@
 #include <string.h>
 #include <signal.h>
 
+//global
+int target;
+pid_t leafs[10];
+int leafs_alive = 0;
+//int manager_pid;
+pid_t x_process_pid;
+
+void block_signals(int signals[], int len)
+{
+    sigset_t block;
+    sigemptyset(&block);
+
+    for (int i = 0; i < len; i++)
+    {
+        sigaddset(&block, signals[i]);
+    }
+    
+    sigprocmask(SIG_BLOCK, &block, NULL);
+}
+
+void leaf_signaler(int sig_n)
+{
+    kill(x_process_pid, SIGUSR2);
+}
+
 void leaf_main(int target)
 {
     char buffer[32];
 
-    int leaf = fork();
-    if (leaf == 0)
+    sprintf(buffer, "%d\n", getpid());
+    write(target, buffer, strlen(buffer));
+
+    signal(SIGUSR1, leaf_signaler);
+
+    int signals[2] = { SIGCHLD, SIGCONT };
+    block_signals(signals, 2);
+
+    while(1)
     {
-        sprintf(buffer, "%d\n", getpid());
-        write(target, buffer, strlen(buffer));
+        //dovrebbe funzionare ed evitare busy waiting stupido ma non funziona
+        pause();
     }
 }
 
-void leaf_killer(int sig_n)
+void leaf_killer(int sig_n, siginfo_t* info, void* context)
 {
+    x_process_pid = info->si_pid;
 
+    leafs_alive--;
+    kill(leafs[leafs_alive], SIGUSR1);
+    kill(leafs[leafs_alive], SIGTERM); //soft termination
+
+    if (leafs_alive == 0)
+    {
+        //kill(manager_pid, SIGKILL);
+        kill(getpid(), SIGKILL);
+    }
+}
+
+void kill_all(int sig_n)
+{
+    for (int i = leafs_alive; i >= 0; i--)
+    {
+        kill(leafs[leafs_alive], SIGKILL);
+    }
+    kill(getpid(), SIGKILL);
 }
 
 void manager_main(int target, int n)
@@ -31,52 +82,78 @@ void manager_main(int target, int n)
 
     for (int i = 0; i < n; i++)
     {
-        leaf_main(target);
+        leafs[i] = fork();
+        if (leafs[i] == 0)
+        {
+            leaf_main(target);
+        }
+        else
+        {
+            leafs_alive++;
+        }
     }
 
-    signal(SIGUSR1, leaf_killer);
+    struct sigaction params;
 
-    while(1);
+    params.sa_sigaction = leaf_killer;
+    params.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &params, NULL);
+
+    signal(SIGTERM, kill_all);
+
+    int signals[1] = { SIGALRM };
+    block_signals(signals, 1);
+
+    while(1)
+    {
+        //dovrebbe funzionare ed evitare busy waiting stupido ma non funziona
+        pause();
+    }
 }
 
-int target;
+//watch ps -H -a -f
+/*
+Running or Runnable (R)
+Uninterruptible Sleep (D)
+Interruptable Sleep (S)
+Stopped (T)
+Zombie (Z)
+*/
 int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        printf("ERROR: missing parameters\n");  
+        fprintf(stderr, "ERROR: missing parameters\n");  
         return 3;
     }
 
     int n = atoi(argv[2]);
     if (n == 0)
     {
-        printf("ERROR: n must be a valid number\n");        
+        fprintf(stderr, "ERROR: n must be a valid number\n");        
         return 4;
     }
     else if (n < 1 || n > 10)
     {
-        printf("ERROR: n must be beetween 1 and 10\n");
+        fprintf(stderr, "ERROR: n must be beetween 1 and 10\n");
         return 4;
     }
 
     char* target_file = argv[1];
-    if (open(target_file, O_RDONLY) == -1)
+    target = open(target_file, O_WRONLY | O_CREAT | O_EXCL | O_APPEND, S_IRUSR | S_IWUSR);
+    if (target == -1)
     {
-        perror("ERROR");
+        fprintf(stderr, "ERROR: file must not exists and be a legal path\n");
         return 5;
     }
-    
     //all controls on input passed
-    target = open(target_file, O_RDWR | O_CREAT | O_APPEND | O_TRUNC);
-    char buffer[32];
-
-    sprintf(buffer, "%d\n", getpid());
     
+    char buffer[32];
+    sprintf(buffer, "%d\n", getpid());
     write(target, buffer, strlen(buffer));
 
-    int manager = fork();
-    if (manager == 0)
+    int manager_pid = fork();
+    if (manager_pid == 0)
     {
         manager_main(target, n);
     }
