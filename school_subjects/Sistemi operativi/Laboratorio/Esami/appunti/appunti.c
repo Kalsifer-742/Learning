@@ -1,0 +1,4 @@
+/*
+non serve using namespace std
+in C non esiste passare per riferimento
+*/
