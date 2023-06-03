@@ -1,0 +1,27 @@
+# Lezione 22/03/22
+
+- `this` per riferirmi ad attributi o metodi della mia classe o all`istanza
+
+## Ereditarietá e Polimorfismo
+
+- keyword `extends`
+  - `Class Cane extends Mammifero {}`
+- la sottoclasse ereditá tutti gli attributi e tutti i metodi della superclasse
+- java non supporta l'eredità multipla
+- una classe se non diversamente specificato eredità la classe Object, _radice dell'intera gerarchia_
+- Object fornisce alcuni importanti metodi:
+  - `equals(Object)`
+  - `finalize()` - deprecata in teoria
+  - `toString()`
+- overriding
+  - consiste nel redefinire i metodi della superclasse
+- `super`
+  - é una pseudo variabile utilizzata per riferire metodi della superclasse
+- costruttori
+  - non vengono ereditati
+  - tramite `super` possono essere chiamati i costruttori della superclasse. Va messa come prima istruzioni. Se il programmatore non lo fa esplicitamente il compilatore inserisce del codice che chiama il costruttore di default (senza parametri) della superclasse.
+- UML
+  - esiste
+- Overloading
+  - possono esistere più metodi con lo stesso nome e diverse implementazioni che si distinguono per numero e/o tipo di parametri
+  - il valore di ritorno non permette di distinguere due metodi, no overloading sul tipo di ritorno
