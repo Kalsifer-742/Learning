@@ -69,6 +69,7 @@ Group<Tourist> gt = ... //uso
 
 - Non posso fare array di generics
   - deriva sempre dall' implementazione
+  - new T[] non e' ammesso
 - Generics non si possono usare con instanceof
 - I parametri tipo non possono essere tipi primitivi
   - ma con wrapper e autoboxing solitamente si risolve
