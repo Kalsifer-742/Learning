@@ -20,6 +20,7 @@
     > p.move(3,4);
     > ```
     >
+  - funziona perchè aggiungo informazioni che al massimo non vengono usate. Rispetto le funzionalità precedenti.
 
 - legame dinamico tra oggetto e tipo, si distingue:
   - dynamic binding (java)
@@ -33,5 +34,14 @@
     -Si controlla se il tipo dinamico è una sottoclasse del tipo statico
     -Se è un sottotipo si controlla se è definito un override
     -Se la risposta è si si utilizza l'implementazione della sottoclasse, altrimenti quella della classe padre
+    - il tipo statico determina quali metodi possono essere invocati. il tipo dinamico determina quale (ri)definizione eseguire
   - late binding
   - lazy evaluation
+
+- 3 tipi
+  - polimorfismo di sottotipo
+    - tramite ereditarietà
+  - ad hoc
+    - overloading di funzioni
+  - parametrico
+    - generics
