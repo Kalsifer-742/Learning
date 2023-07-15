@@ -26,6 +26,9 @@
   - possono esistere più metodi con lo stesso nome e diverse implementazioni che si distinguono per numero e/o tipo di parametri
   - il valore di ritorno non permette di distinguere due metodi, no overloading sul tipo di ritorno
 
+- overloading vs overriding
+	- a volte avviene uno a volte l'altro dipende dai casi e tipi statici e dinamici (guarda slide)
+
 - costruttore di default
   - esiste e viene creato
   - MA se la classe padre definisce un costruttore con parametri non può essere creato un costruttore di default. Se il programmatore specifica un costruttore il linguaggio non introduce altro
@@ -53,3 +56,11 @@ class B extends A {
 
 //NON compila
 ```
+
+- keyword
+	- final
+		- definisce una classe o un metodo come non più modificabile (o una variabile)
+	- private
+		- visibile solo internamente alla classe
+	- protected
+		- visibile solo dalle classi dello stesso package e dalle sottoclassi

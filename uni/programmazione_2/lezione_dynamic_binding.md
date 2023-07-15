@@ -45,3 +45,6 @@
     - overloading di funzioni
   - parametrico
     - generics
+
+- static
+	- rende il binding statico
