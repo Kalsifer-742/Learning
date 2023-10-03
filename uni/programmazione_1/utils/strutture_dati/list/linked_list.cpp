@@ -44,7 +44,6 @@ void insert_to_tail(int val, node*& head)
             current = current->next;
         }
         current->next = tmp;
-        
     }
 }
 
