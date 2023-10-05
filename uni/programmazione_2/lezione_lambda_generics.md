@@ -85,3 +85,7 @@ obj instanceof List<? super Number> //error
 
 - altri casi particolari...
 - [approfondimento sui generics in java](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)
+
+## Extras
+
+- dentro le lamba attraverso this posso solo riferirmi all'oggetto che la usa
