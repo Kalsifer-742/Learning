@@ -1,4 +1,12 @@
+use std::fmt;
 use std::collections::HashMap;
+use std::slice::Iter;
+
+mod sentence;
+mod test;
+
+use sentence::Sentence;
+use test::magic_sentence;
 
 #[allow(dead_code)]
 fn string_reverse(str: &str) -> String {
@@ -154,7 +162,6 @@ fn insert_if_longer(vec: &mut Vec<String>, string: String) {
     }
 }
 
-use std::slice::Iter;
 fn build_vector(it: Iter<i32>) -> Vec<i32> {
     let mut vec = Vec::new();
     for n in it {
@@ -183,7 +190,6 @@ fn pancake_sort(vec: &mut Vec<i32>) {
         //println!("count {}, ind: {}", count, max_index + count);
         vec[count ..= max_index + count].reverse();
         //println!("reverse {:?}", vec);
-
         count += 1;
         if count == vec.len() - 1 {
             break;
@@ -197,6 +203,7 @@ fn merge(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
     return Vec::from(merge);
 }
 
+#[allow(dead_code)]
 enum Operation {
     Add,
     Sub,
@@ -222,6 +229,164 @@ fn evaluate_expression(exp : Expression) -> i32 {
                 Operation::Div => l / r,
             }
         }
+    }
+}
+
+fn is_it_luhn(input: &str) -> bool {
+    input.trim()
+        .split_whitespace()
+        .map(|group| {
+            group.chars()
+                .map(|digit| digit.to_digit(10).unwrap())
+                .collect()
+        })
+        .collect::<Vec<Vec<u32>>>()
+        .concat()
+        .iter()
+        .enumerate()
+        .map(|(index, digit)| {
+            if index % 2 == 0 {
+                if *digit * 2 <= 9 {
+                    *digit * 2
+                } else {
+                    *digit * 2 - 9
+                }
+            } else {
+                *digit
+            }
+        }).collect::<Vec<u32>>()
+        .iter()
+        .sum::<u32>() % 10 == 0
+}
+
+#[allow(dead_code)]
+enum Fuel {
+    Diesel,
+    Gasoline,
+    LPG,
+    Methane,
+    Electric
+}
+
+#[allow(dead_code)]
+enum IP {
+    IPV4(u8, u8, u8, u8),
+    IPV6(u16, u16, u16, u16, u16, u16, u16, u16)
+}
+
+#[allow(dead_code)]
+struct Point {
+    x: f64,
+    y: f64,
+    z: f64
+
+}
+
+fn recognise_owner<'a>(plates: &'a HashMap<&str, &str>, input: &str) -> Option<&'a str> {
+    return match plates.get(input) {
+        None => None,
+        Some(owner) => Some(owner)
+    }
+}
+
+#[derive(Eq, Hash, PartialEq)]
+enum Item {
+    Coke,
+    Coffee,
+    Chips
+}
+
+#[allow(dead_code)]
+enum Coin {
+    Cents10,
+    Cents20,
+    Cents50,
+    Euro1,
+    Euro2
+}
+
+impl Coin {
+    fn to_cents(&self) -> u32 {
+        return match &self {
+            Coin::Cents10 => 10,
+            Coin::Cents20 => 20,
+            Coin::Cents50 => 50,
+            Coin::Euro1 => 100,
+            Coin::Euro2 => 200
+        };
+    }
+}
+
+struct VendingMachine {
+    coins: u32,
+    items: HashMap<Item, usize> //This field should associate an Item type to the number of available items to buy
+}
+
+impl VendingMachine {
+    fn new(items: HashMap<Item, usize>) -> Self {
+        Self {
+            coins: 0, //cents
+            items
+        }
+    }
+
+    fn add_item(&mut self, item: Item, quantity: usize) {
+        self.items.entry(item).and_modify(|storage| *storage += quantity).or_insert(quantity);
+    }
+
+    fn insert_coin(&mut self, coin: Coin) -> Result<&str, &str> {
+        self.coins += coin.to_cents();
+        return Ok("Credit increased successfully");
+        //return Ok(format!("Credit increased successfully to {}", self.coins).as_str());
+    }
+
+    fn get_item_price(&self, item: &Item) -> u32 {
+        return match item {
+            Item::Coke => 100,
+            Item::Coffee => 50,
+            Item::Chips => 150,
+        };
+    }
+
+    fn buy(&mut self, item: Item) -> Result<u32, &str> {
+        if self.coins - self.get_item_price(&item) > 0 {
+            self.coins -= self.get_item_price(&item);
+            self.items.entry(item).and_modify(|storage| *storage -= 1);
+            return Ok(self.coins);
+        } else {
+            return Err("Credit is not sufficient");
+        }
+    }
+}
+#[derive(Debug)]
+struct Date(u8, u8, u16);
+
+#[derive(Debug)]
+struct Hour(u8, u8);
+
+#[derive(Debug)]
+struct BoxShipping {
+    name: String,
+    barcode: String,
+    shipment_date: Date,
+    shipment_hour: Hour
+}
+
+impl fmt::Display for Date {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}/{}/{}", self.0, self.1, self.2)
+    }
+}
+
+impl fmt::Display for Hour {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:0>2}:{:02}", self.0, self.1) //different ways to format in the same way
+    }
+}
+
+impl fmt::Display for BoxShipping {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "name: {} | barcode: {} | shipment: {}-{}", self.name, self.barcode, self.shipment_date, self.shipment_hour)
     }
 }
 
@@ -325,4 +490,48 @@ fn main() {
     );
     println!("(2-8)x3 = {}", eval);
 
+    
+    let lun_number = "4539 3195 0343 6467";
+    println!("{}", is_it_luhn(lun_number));
+
+    let plates = HashMap::from([
+        ("GR·091JW", "Mario Rossi"),
+        ("ER·929NG", "Baldo Star")
+    ]);
+    println!("{}", recognise_owner(&plates, "ER·929NG").unwrap());
+
+    let mut vending_machine = VendingMachine::new(HashMap::from([
+        (Item::Coke, 3),
+        (Item::Coffee, 10),
+    ]));
+
+    vending_machine.add_item(Item::Chips, 1);
+    println!("{}", vending_machine.insert_coin(Coin::Euro2).unwrap());
+    println!("{}", vending_machine.get_item_price(&Item::Coffee));
+    match vending_machine.buy(Item::Chips) {
+        Ok(change) => println!("change: {}", change),
+        Err(error) => println!("{}", error),
+    }
+
+    let box_shipping = BoxShipping {
+        name: String::from("Youth"),
+        barcode: String::from("1128403"),
+        shipment_date: Date(12, 01, 2001),
+        shipment_hour: Hour(9, 0),
+    };
+
+    println!("{:?}", &box_shipping);
+    println!("{}", &box_shipping);
+
+    let mut first_sentence = Sentence::new_default();
+    first_sentence.new("Hello my name was cool yesterday");
+    let mut second_sentence = Sentence::new_default();
+    second_sentence.new("Hi my name is cool");
+    let mut sentences = HashMap::from([
+        (0, first_sentence),
+        (1, second_sentence)
+    ]);
+
+    let magic = magic_sentence(&mut sentences, 0, 1).unwrap();
+    println!("{:?}", magic.words);
 }

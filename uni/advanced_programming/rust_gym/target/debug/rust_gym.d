@@ -1,1 +1,1 @@
-/home/kalsifer/Desktop/Learning/uni/advanced_programming/rust_gym/target/debug/rust_gym: /home/kalsifer/Desktop/Learning/uni/advanced_programming/rust_gym/src/main.rs
+/home/kalsifer/Desktop/Learning/uni/advanced_programming/rust_gym/target/debug/rust_gym: /home/kalsifer/Desktop/Learning/uni/advanced_programming/rust_gym/src/main.rs /home/kalsifer/Desktop/Learning/uni/advanced_programming/rust_gym/src/sentence.rs /home/kalsifer/Desktop/Learning/uni/advanced_programming/rust_gym/src/test.rs
