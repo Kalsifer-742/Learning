@@ -232,6 +232,7 @@ fn evaluate_expression(exp : Expression) -> i32 {
     }
 }
 
+//it was fun to write meme code
 fn is_it_luhn(input: &str) -> bool {
     input.trim()
         .split_whitespace()
