@@ -1,5 +1,5 @@
 use std::fmt;
-use std::collections::HashMap;
+use std::collections::{HashMap, LinkedList};
 use std::slice::Iter;
 
 mod sentence;
@@ -388,6 +388,37 @@ impl fmt::Display for Hour {
 impl fmt::Display for BoxShipping {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "name: {} | barcode: {} | shipment: {}-{}", self.name, self.barcode, self.shipment_date, self.shipment_hour)
+    }
+}
+
+trait Split<'a> {
+    type ReturnType;
+    fn split(&'a self) -> (Self::ReturnType, Self::ReturnType);
+}
+
+impl<'a> Split<'a> for String {
+    type ReturnType = &'a str;
+
+    fn split(&'a self) -> (Self::ReturnType, Self::ReturnType) {
+        self.split_at(self.len()/2)
+    }
+}
+
+impl<'a> Split<'a> for &[i32] {
+    type ReturnType = &'a [i32];
+
+    fn split(&'a self) -> (Self::ReturnType, Self::ReturnType) {
+        self.split_at(self.len()/2)
+    }
+}
+
+impl<'a> Split<'a> for LinkedList<f64> {
+    type ReturnType = LinkedList<f64>;
+
+    fn split(&'a self) -> (Self::ReturnType, Self::ReturnType) {
+        let mut left = self.clone();
+        let right = left.split_off(self.len()/2);
+        (left, right)
     }
 }
 
