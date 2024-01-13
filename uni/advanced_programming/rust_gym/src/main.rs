@@ -1,5 +1,9 @@
 use std::fmt;
 use std::collections::{HashMap, LinkedList};
+use std::f32::consts::PI;
+use std::fmt::{Display, Formatter};
+use std::fs::ReadDir;
+use std::ops::{Add, Sub};
 use std::slice::Iter;
 
 mod sentence;
@@ -398,7 +402,6 @@ trait Split<'a> {
 
 impl<'a> Split<'a> for String {
     type ReturnType = &'a str;
-
     fn split(&'a self) -> (Self::ReturnType, Self::ReturnType) {
         self.split_at(self.len()/2)
     }
@@ -406,7 +409,6 @@ impl<'a> Split<'a> for String {
 
 impl<'a> Split<'a> for &[i32] {
     type ReturnType = &'a [i32];
-
     fn split(&'a self) -> (Self::ReturnType, Self::ReturnType) {
         self.split_at(self.len()/2)
     }
@@ -414,12 +416,321 @@ impl<'a> Split<'a> for &[i32] {
 
 impl<'a> Split<'a> for LinkedList<f64> {
     type ReturnType = LinkedList<f64>;
-
-    fn split(&'a self) -> (Self::ReturnType, Self::ReturnType) {
+    fn split(&self) -> (Self::ReturnType, Self::ReturnType) {
         let mut left = self.clone();
         let right = left.split_off(self.len()/2);
         (left, right)
     }
+}
+
+struct Point2D {
+    x: f32,
+    y: f32
+}
+
+#[allow(dead_code)]
+struct Circle {
+    radius: f32,
+    center: Point2D
+}
+
+struct Rectangle{
+    top_left: Point2D,
+    bottom_right: Point2D
+}
+
+impl Default for Point2D{
+    fn default() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+        }
+    }
+}
+
+impl Default for Circle {
+    fn default() -> Self {
+        Self {
+            radius: 1.0,
+            center: Point2D::default()
+        }
+    }
+}
+
+impl Default for Rectangle{
+    fn default() -> Self {
+        Self {
+            top_left: Point2D { x: -1.0, y: 1.0 },
+            bottom_right: Point2D { x: 1.0, y: -1.0 }
+        }
+    }
+}
+
+impl Add for Point2D {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl Sub for Point2D {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
+struct Area {
+    value: f32
+}
+
+impl Default for Area {
+    fn default() -> Self {
+        Self{
+            value: 0.0
+        }
+    }
+}
+
+impl Display for Area {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Area is {} cm²", self.value)
+    }
+}
+
+trait GetArea {
+    fn get_area(&self) -> Area;
+}
+
+impl GetArea for Point2D {
+    fn get_area(&self) -> Area {
+        Area {
+            value: 0.0
+        }
+    }
+}
+
+impl GetArea for Circle {
+    fn get_area(&self) -> Area {
+        Area {
+            value: PI * self.radius.powi(2)
+        }
+    }
+}
+
+impl GetArea for Rectangle {
+    fn get_area(&self) -> Area {
+        let base = self.top_left.x - self.bottom_right.x;
+        let height = self.top_left.y - self.bottom_right.y;
+
+        Area {
+            value: (base * height).abs()
+        }
+    }
+}
+
+impl Add for Area{
+    type Output = Area;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            value: self.value + rhs.value
+        }
+    }
+}
+
+fn sum_area(input: &[&dyn GetArea]) -> f32 {
+    let mut result = 0.0;
+    for geometric_form in input {
+        result += geometric_form.get_area().value;
+    }
+    return result;
+}
+
+fn skip_prefix<'a>(telephone_number: &'a str, prefix: &str) -> &'a str {
+    telephone_number.trim_start_matches(prefix)
+}
+
+struct Chair<'a> {
+    color: &'a str,
+    quantity: &'a usize
+}
+
+struct Wardrobe<'a> {
+    color: &'a str,
+    quantity: &'a usize
+}
+
+trait Object {
+    fn build(&self) -> &str;
+    fn get_quantity(&self) -> String;
+}
+
+impl<'a> Object for Chair<'a> {
+    fn build(&self) -> &str {
+        "Chair has been built"
+    }
+
+    fn get_quantity(&self) -> String {
+        format!("There are {} Chair", self.quantity)
+    }
+}
+
+impl<'a> Object for Wardrobe<'a> {
+    fn build(&self) -> &str {
+        "Wardrobe has been built"
+    }
+
+    fn get_quantity(&self) -> String {
+        format!("There are {} Wardrobe", self.quantity)
+    }
+}
+
+impl Display for Chair<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        if *self.quantity > 0 {
+            write!(f, "There are {} {} Chair", self.quantity, self.color)
+        } else {
+            write!(f, "There are 0 Chair")
+        }
+    }
+}
+
+impl Display for Wardrobe<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        if *self.quantity > 0 {
+            write!(f, "There are {} {} Wardrobe", self.quantity, self.color)
+        } else {
+            write!(f, "There are 0 Wardrobe")
+        }
+    }
+}
+
+#[derive(PartialEq, Eq)]
+enum Role {
+    GUEST,
+    USER,
+    ADMIN,
+}
+
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
+enum Permission {
+    READ,
+    WRITE,
+    EXECUTE
+}
+
+struct Actions{
+    action: String,
+    permission: HashMap<Permission, bool>
+}
+
+struct User{
+    name: String,
+    role: Role,
+    actions: Vec<Actions>
+}
+
+trait Auth{
+    fn check_permission(&self, action: &str, permission_type: &Permission) -> bool;
+    fn can_write(&self, string: &str) -> bool;
+    fn can_read(&self, string: &str) -> bool;
+    fn can_execute(&self, string: &str) -> bool;
+}
+
+impl Auth for User{
+    fn check_permission(&self, action: &str, permission_type: &Permission) -> bool {
+        for self_action in self.actions.iter() {
+            if self_action.action == action {
+                if self_action.permission.get(permission_type).is_some() {
+                    if *self_action.permission.get(permission_type).unwrap() {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    fn can_write(&self, string: &str) -> bool {
+        self.check_permission(string, &Permission::WRITE)
+    }
+
+    fn can_read(&self, string: &str) -> bool {
+        self.check_permission(string, &Permission::READ)
+    }
+
+    fn can_execute(&self, string: &str) -> bool {
+        self.check_permission(string, &Permission::EXECUTE)
+    }
+}
+
+impl Default for Actions {
+    fn default() -> Self {
+        Self {
+            action: "".to_string(),
+            permission: HashMap::from([
+                (Permission::READ, false),
+                (Permission::WRITE, false),
+                (Permission::EXECUTE, false)
+            ])
+        }
+    }
+}
+
+impl Actions {
+    fn new(action: String, read: bool, write: bool, execute: bool) -> Self {
+        Self {
+            action,
+            permission: HashMap::from([
+                (Permission::READ, read),
+                (Permission::WRITE, write),
+                (Permission::EXECUTE, execute)
+            ])
+        }
+    }
+}
+
+impl Default for User {
+    fn default() -> Self {
+        Self {
+            name: "Guest".to_string(),
+            role: Role::GUEST,
+            actions: vec![],
+        }
+    }
+}
+
+impl User {
+    fn change_role(&mut self, role: Role) -> Result<(), String> {
+        return match self.role {
+            Role::ADMIN => { self.role = role; Ok(()) }
+            Role::USER => { match role {
+                Role::ADMIN => Err(String::from("Cannot change role to ADMIN")),
+                role => { self.role = role; Ok(()) }
+            } }
+            Role::GUEST => { match role {
+                Role::GUEST => { self.role = role; Ok(()) }
+                _ => Err(String::from("Cannot change role when GUEST"))
+            } }
+        }
+    }
+}
+
+fn sudo_change_permission(user: &mut User, string: String, permission: Permission, value: bool) {
+    user.actions.iter_mut().for_each(|a| {
+        if a.action == string {
+            a.permission.insert(permission, value);
+        }
+    })
 }
 
 fn main() {
@@ -566,4 +877,31 @@ fn main() {
 
     let magic = magic_sentence(&mut sentences, 0, 1).unwrap();
     println!("{:?}", magic.words);
+
+    let circle = Circle::default();
+    let rectangle = Rectangle::default();
+    println!("Circle area: {}", circle.get_area());
+    println!("Rectangle area: {}", rectangle.get_area());
+    println!("sum of areas is: {}", sum_area(&[&circle, &rectangle]));
+
+    let number = "+391234567890";
+    let prefix = "+39";
+    println!("trimmed number {}", skip_prefix(number, prefix));
+
+    let chair = Chair { color: "red", quantity: &2 };
+    let wardrobe = Wardrobe { color: "brown", quantity: &5 };
+    println!("{}", chair.build());
+    println!("{}", chair.get_quantity());
+    println!("{}", wardrobe.build());
+    println!("{}", wardrobe);
+
+    let mut user = User::default();
+    user.actions.push(Actions::new(String::from("Parlare"), true, true, false));
+    println!("User può parlare ? {}", user.can_read("Parlare"));
+    match user.change_role(Role::USER) {
+        Ok(_) => { println!("Ok") }
+        Err(e) => { println!("{e}") }
+    }
+    sudo_change_permission(&mut user, "Parlare".to_string(), Permission::READ, false);
+    println!("User può parlare ? {}", user.can_read("Parlare"));
 }
