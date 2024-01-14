@@ -1,10 +1,12 @@
 use std::fmt;
 use std::collections::{HashMap, LinkedList};
 use std::f32::consts::PI;
-use std::fmt::{Display, Formatter};
-use std::fs::ReadDir;
+use std::fmt::{Debug, Display, Formatter};
+use std::ops::Mul;
 use std::ops::{Add, Sub};
 use std::slice::Iter;
+use rand::{random, thread_rng};
+use rand::prelude::SliceRandom;
 
 mod sentence;
 mod test;
@@ -614,6 +616,7 @@ impl Display for Wardrobe<'_> {
     }
 }
 
+#[allow(dead_code)]
 #[derive(PartialEq, Eq)]
 enum Role {
     GUEST,
@@ -633,6 +636,7 @@ struct Actions{
     permission: HashMap<Permission, bool>
 }
 
+#[allow(dead_code)]
 struct User{
     name: String,
     role: Role,
@@ -731,6 +735,379 @@ fn sudo_change_permission(user: &mut User, string: String, permission: Permissio
             a.permission.insert(permission, value);
         }
     })
+}
+
+trait Printable {
+    fn print(&self);
+}
+
+impl Printable for i32{
+    fn print(&self) {
+        println!("{}", self);
+    }
+}
+
+impl Printable for String {
+    fn print(&self) {
+        println!("{}", self);
+    }
+}
+
+impl<T> Printable for Vec<T> where T: Printable {
+    fn print(&self) {
+        for element in self {
+            element.print();
+        }
+    }
+}
+
+#[allow(dead_code)]
+// monomorphization
+fn print(argument: impl Printable) {
+    argument.print();
+}
+
+#[allow(dead_code)]
+// dynamic dispatch
+fn print_dyn(t: &dyn Printable) {
+    t.print();
+}
+
+#[derive(Debug, Copy, Clone, Default)]
+enum Category {
+    Horror,
+    #[default]
+    Fantasy,
+    SciFi,
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+struct Book<'a> {
+    title: &'a str,
+    cat: Category,
+}
+
+#[derive(Debug, Default)]
+struct Library<'a> {
+    bookcase: [Vec<Book<'a>>; 10],
+}
+
+impl Default for Book<'_> {
+    fn default() -> Self {
+        Self {
+            title: ["The Lord of the rings", "Obscura", "Dune"].choose(&mut thread_rng()).unwrap(),
+            cat: *[Category::Horror, Category::Fantasy, Category::SciFi].choose(&mut thread_rng()).unwrap(),
+        }
+    }
+}
+
+#[allow(dead_code)]
+impl Book<'_> {
+    fn default_with_cat(cat: Category) -> Self {
+        Self {
+            cat,
+            ..Self::default()
+        }
+    }
+}
+
+trait Populatable {
+    fn populate(&mut self);
+}
+
+impl Populatable for Library<'_>{
+    fn populate(&mut self) {
+        for shelf in &mut self.bookcase {
+            for _i in 0..3 {
+                shelf.push(Book::default());
+            }
+        }
+    }
+}
+
+fn restricted<T, U>(t1: T, t2: T, u: U) -> T
+    where
+        T: Debug + PartialOrd + Ord,
+        U: Display
+{
+    let smaller;
+    if t1 < t2 {
+        smaller = t1;
+    } else {
+        smaller = t2;
+    }
+
+    println!("minor: {:>5?}\nu: {:>9}", smaller, u);
+
+    return smaller;
+}
+
+struct Tasks {
+    tasks: Vec<Task>
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+struct Task {
+    name: String,
+    priority: i32,
+    done: bool
+}
+
+#[allow(dead_code)]
+impl Task {
+    fn new(name: String, priority: i32, done: bool) -> Self {
+        Task {
+            name,
+            priority,
+            done
+        }
+    }
+}
+
+#[allow(dead_code)]
+impl Tasks {
+    fn new(tasks: Vec<Task>) -> Self {
+        Tasks {
+            tasks
+        }
+    }
+}
+
+impl Iterator for Tasks {
+    type Item = Task;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.tasks
+            .iter()
+            .position(|t| !t.done)
+            .map(|i| self.tasks.remove(i))
+            // .iter()
+            // .filter(|t| !t.done)
+            // .collect()
+    }
+}
+
+struct Pair(i32, String);
+
+impl Add<i32> for Pair {
+    type Output = Pair;
+
+    fn add(self, rhs: i32) -> Self::Output {
+        Self(self.0 + rhs, self.1)
+    }
+}
+
+impl Sub<i32> for Pair {
+    type Output = Pair;
+
+    fn sub(self, rhs: i32) -> Self::Output {
+        Self(self.0 - rhs, self.1)
+
+    }
+}
+
+impl Add<&str> for Pair {
+    type Output = Pair;
+
+    fn add(self, rhs: &str) -> Self::Output {
+        Self(self.0, self.1 + rhs)
+    }
+}
+
+impl Sub<&str> for Pair {
+    type Output = Pair;
+
+    fn sub(self, rhs: &str) -> Self::Output {
+        Self(self.0, self.1.replace(rhs, ""))
+    }
+}
+
+impl Add for Pair {
+    type Output = Pair;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        self + rhs.0 + rhs.1.as_str()
+        // Self(self.0 + rhs.0, self.1 + &rhs.1)
+    }
+}
+
+impl Sub for Pair {
+    type Output = Pair;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self - rhs.0 - rhs.1.as_str()
+        // Self(self.0 - rhs.0, self.1 - &rhs.1)
+    }
+}
+
+impl Mul<i32> for Pair {
+    type Output = Pair;
+
+    fn mul(self, rhs: i32) -> Self::Output {
+        Self(self.0.pow(rhs as u32), self.1.repeat(rhs as usize))
+    }
+}
+
+#[derive(Debug)]
+struct Gate<S> {
+    state: S
+}
+
+#[derive(Debug)]
+struct Open;
+struct Closed;
+struct Stopped {
+    reason: String
+}
+
+impl Stopped {
+    fn new(reason: String) -> Self {
+        Self { reason }
+    }
+}
+
+impl<S> Gate<S> {
+    fn new(state: S) -> Gate<S> {
+        Self { state }
+    }
+}
+
+#[allow(dead_code)]
+impl Gate<Open>{
+    fn close(self) -> Result<Gate<Closed>, Gate<Stopped>> {
+        if random() {
+            Ok(Gate::new(Closed))
+        } else {
+            Err(Gate::new(Stopped::new("Cat is stucked".to_string())))
+        }
+    }
+}
+
+impl Gate<Closed> {
+    fn open(self) -> Result<Gate<Open>, Gate<Stopped>> {
+        if random() {
+            Ok(Gate::new(Open))
+        } else {
+            Err(Gate::new(Stopped::new("The Lambo is in the way".to_string())))
+        }
+    }
+}
+
+#[allow(dead_code)]
+impl Gate<Stopped> {
+    fn open(self) -> Gate<Open> {
+        Gate::new(Open)
+    }
+
+    fn close(self) -> Gate<Closed> {
+        Gate::new(Closed)
+    }
+}
+
+trait Heatable {
+    fn cook(&mut self);
+}
+
+trait Friable {
+    fn cook(&mut self);
+}
+
+trait Heater {
+    fn heat(&self, input: &mut dyn Heatable);
+}
+
+trait Frier {
+    fn fry(&self, input: &mut dyn Friable);
+}
+
+struct Oven;
+impl Heater for Oven {
+    fn heat(&self, input: &mut dyn Heatable) {
+        input.cook();
+    }
+}
+
+struct Pan;
+impl Heater for Pan {
+    fn heat(&self, input: &mut dyn Heatable) {
+        input.cook();
+    }
+}
+
+impl Frier for Pan {
+    fn fry(&self, input: &mut dyn Friable) {
+        input.cook();
+    }
+}
+
+struct Pie {
+    ready: bool
+}
+
+enum CarrotState {
+    Raw,
+    Cooked,
+    Fried,
+    Burnt
+}
+
+struct Carrot {
+    cooking_state: CarrotState
+}
+
+trait Edible {
+    fn eat(&self);
+}
+
+impl Heatable for Pie {
+    fn cook(&mut self) {
+        if self.ready {
+            println!("You burned the pie!");
+        } else {
+            self.ready = true;
+        }
+    }
+}
+
+impl Heatable for Carrot {
+    fn cook(&mut self) {
+        match self.cooking_state {
+            CarrotState::Raw => self.cooking_state = CarrotState::Cooked,
+            _ => self.cooking_state = CarrotState::Burnt
+        }
+    }
+}
+
+impl Friable for Carrot {
+    fn cook(&mut self) {
+        match self.cooking_state {
+            CarrotState::Fried => self.cooking_state = CarrotState::Burnt,
+            _ => self.cooking_state = CarrotState::Fried,
+        }
+    }
+}
+
+impl Edible for Pie {
+    fn eat(&self) {
+        if self.ready {
+            println!("yummy");
+        } else {
+            println!("you got stomach ache");
+        }
+    }
+}
+
+impl Edible for Carrot {
+    fn eat(&self) {
+        match self.cooking_state {
+            CarrotState::Raw => println!("mmh, crunchy"),
+            CarrotState::Cooked => println!("mhh, yummy"),
+            CarrotState::Fried => println!("mhh, crispy"),
+            CarrotState::Burnt => println!("bleah, burnt"),
+        }
+    }
 }
 
 fn main() {
@@ -904,4 +1281,32 @@ fn main() {
     }
     sudo_change_permission(&mut user, "Parlare".to_string(), Permission::READ, false);
     println!("User può parlare ? {}", user.can_read("Parlare"));
+
+    restricted(3, 2, "ape");
+
+    let tasks = Tasks::new(vec![
+        Task::new("Mangiare".to_string(), 10, false),
+        Task::new("Dormire".to_string(), 7, true),
+        Task::new("Camminare".to_string(), 8, false)
+    ]);
+
+    for (_i, task) in tasks.enumerate() {
+        println!("{task:?}");
+    }
+
+    let gate = Gate::new(Closed);
+    match gate.open() {
+        Ok(g) => { println!("{g:?}") },
+        Err(g) => { println!("{}", g.state.reason) }
+    }
+
+    let mut pie = Pie { ready: false };
+    let mut carrot = Carrot { cooking_state: CarrotState::Raw };
+    let oven = Oven;
+    let frying_pan = Pan;
+    oven.heat(&mut pie);
+    oven.heat(&mut carrot);
+    frying_pan.fry(&mut carrot);
+    pie.eat();
+    carrot.eat();
 }
