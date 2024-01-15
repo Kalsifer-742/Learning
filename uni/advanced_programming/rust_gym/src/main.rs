@@ -1,5 +1,6 @@
 use std::fmt;
-use std::collections::{HashMap, LinkedList};
+#[allow(unused_imports)]
+use std::collections::{HashMap, LinkedList, VecDeque};
 use std::f32::consts::PI;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::Mul;
@@ -1110,6 +1111,106 @@ impl Edible for Carrot {
     }
 }
 
+struct TreeNode<T: PartialEq + PartialOrd + Clone + Display> {
+    value: T,
+    left: Option<Box<TreeNode<T>>>,
+    right: Option<Box<TreeNode<T>>>
+}
+
+impl<T: PartialEq + PartialOrd + Clone + Display> TreeNode<T> {
+    fn new(value: T) -> TreeNode<T> {
+        TreeNode {
+            value,
+            left: None,
+            right: None,
+        }
+    }
+
+    fn from_vec(values: Vec<T>) -> TreeNode<T> {
+        let mut binary_tree = TreeNode::new(values[0].clone());
+        for value in values {
+            binary_tree.insert(value);
+        }
+        return binary_tree;
+    }
+
+    fn insert(&mut self, value: T) {
+        if value < self.value {
+            match &mut self.left {
+                Some(l_node) => { l_node.insert(value) }
+                None => { self.left = Some(Box::new(TreeNode::new(value))) }
+            }
+        } else {    //Difference ?
+            match self.right {
+                Some(ref mut r_node) => { r_node.insert(value) }
+                None => { self.right = Some(Box::new(TreeNode::new(value))) }
+            }
+        }
+    }
+
+    // fn print(&self) {
+    //     let mut explored = VecDeque::new();
+    //     explored.push_front(self);
+    //     while !explored.is_empty() {
+    //         let v = explored.pop_back().unwrap();
+    //         print!("{}", v.value);
+    //
+    //         if v.left.is_some() {
+    //             explored.push_front(v.left.unwrap().as_ref());
+    //         }
+    //         if v.right.is_some() {
+    //             explored.push_front(v.right.unwrap().as_ref());
+    //         }
+    //     }
+    // }
+}
+
+#[derive(Debug)]
+struct Car {
+    model: String,
+    year: u32,
+    price: u32,
+    rent: bool
+}
+
+struct CarDealer {
+    cars: Vec<Car>
+}
+
+struct CarUser {
+    car: Option<Car>
+}
+
+impl CarDealer {
+    fn new(cars: Vec<Car>) -> CarDealer {
+        CarDealer{
+            cars
+        }
+    }
+
+    fn add_car(&mut self, car: Car) {
+        self.cars.push(car);
+    }
+
+    fn print_cars(&self) {
+        for car in &self.cars {
+            print!("{car:?} ");
+        }
+        println!();
+    }
+
+    fn rent_user(&mut self, user: &mut CarUser, model: String) {
+        for car in &mut self.cars {
+            if car.model == model {
+                user.car = Some(car);
+                car.rent = true;
+                return;
+            }
+        }
+        println!("Car not found");
+    }
+}
+
 fn main() {
     let str = "Ciao";
     //println!("{}", str);
@@ -1309,4 +1410,8 @@ fn main() {
     frying_pan.fry(&mut carrot);
     pie.eat();
     carrot.eat();
+
+    #[allow(unused_variables)]
+    let binary_tree = TreeNode::from_vec(vec![1,3,2,6,5,5]);
+    // binary_tree.print();
 }
