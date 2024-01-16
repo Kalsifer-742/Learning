@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::fmt;
 #[allow(unused_imports)]
 use std::collections::{HashMap, LinkedList, VecDeque};
@@ -884,9 +886,6 @@ impl Iterator for Tasks {
             .iter()
             .position(|t| !t.done)
             .map(|i| self.tasks.remove(i))
-            // .iter()
-            // .filter(|t| !t.done)
-            // .collect()
     }
 }
 
@@ -1165,6 +1164,7 @@ impl<T: PartialEq + PartialOrd + Clone + Display> TreeNode<T> {
     // }
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Car {
     model: String,
@@ -1173,23 +1173,52 @@ struct Car {
     rent: bool
 }
 
-struct CarDealer {
-    cars: Vec<Car>
+impl Car {
+    pub fn new(model: String, year: u32, price: u32, rent: bool) -> Self {
+        Self { model, year, price, rent }
+    }
 }
 
+impl Default for Car {
+    fn default() -> Self {
+        Self {
+            model: "Fiat Panda".to_string(),
+            year: 1999,
+            price: 100,
+            rent: false
+        }
+    }
+}
+
+struct CarDealer {
+    cars: Vec<Rc<RefCell<Car>>>
+}
+
+#[derive(Debug)]
 struct CarUser {
-    car: Option<Car>
+    car: Option<Rc<RefCell<Car>>>
+}
+
+impl CarUser {
+    fn print_car(&self) {
+        match self.car.clone() {
+            None => { println!("User has no car") }
+            Some(car) => {
+                println!("{car:?}");
+            }
+        }
+    }
 }
 
 impl CarDealer {
-    fn new(cars: Vec<Car>) -> CarDealer {
+    fn new(cars: Vec<Rc<RefCell<Car>>>) -> CarDealer {
         CarDealer{
             cars
         }
     }
 
     fn add_car(&mut self, car: Car) {
-        self.cars.push(car);
+        self.cars.push(Rc::new(RefCell::new(car)));
     }
 
     fn print_cars(&self) {
@@ -1200,14 +1229,24 @@ impl CarDealer {
     }
 
     fn rent_user(&mut self, user: &mut CarUser, model: String) {
-        for car in &mut self.cars {
-            if car.model == model {
-                user.car = Some(car);
-                car.rent = true;
+        for car in &self.cars {
+            if car.borrow().model == model {
+                user.car = Some(Rc::clone(car));
+                car.borrow_mut().rent = true;
                 return;
             }
         }
         println!("Car not found");
+    }
+
+    fn end_rental(&self, user: &mut CarUser){
+        match &user.car {
+            None => { println!("User has no car") }
+            Some(car) => {
+                car.borrow_mut().rent = false;
+                user.car = None;
+            }
+        }
     }
 }
 
@@ -1414,4 +1453,23 @@ fn main() {
     #[allow(unused_variables)]
     let binary_tree = TreeNode::from_vec(vec![1,3,2,6,5,5]);
     // binary_tree.print();
+
+    let fiat_panda = Car::default();
+
+    let lambo = Car::new("Lambo".to_string(), 1985, 800000, false);
+
+    let mut car_user = CarUser { car: Some(Rc::new(RefCell::new(
+        fiat_panda
+    ))) };
+
+    let mut car_dealer = CarDealer::new( vec![] );
+    car_dealer.add_car(lambo);
+    car_user.print_car();
+    car_dealer.print_cars();
+    car_dealer.rent_user(&mut car_user, "Lambo".to_string());
+    car_dealer.print_cars();
+    car_user.print_car();
+    car_dealer.end_rental(&mut car_user);
+    car_dealer.print_cars();
+    car_user.print_car();
 }
