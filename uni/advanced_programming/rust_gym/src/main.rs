@@ -1250,6 +1250,195 @@ impl CarDealer {
     }
 }
 
+trait Sound {
+    fn make_sound(&self) -> String;
+}
+
+struct Cat;
+struct Dog;
+
+impl Sound for Cat {
+    fn make_sound(&self) -> String {
+        format!("miao")
+    }
+}
+
+impl Sound for Dog {
+    fn make_sound(&self) -> String {
+        format!("bau")
+    }
+}
+
+struct FarmCell {
+    element: Box<dyn Sound>,
+    next: Option<Box<FarmCell>>
+}
+
+impl FarmCell {
+    fn new(element: Box<dyn Sound>) -> Self {
+        Self {
+            element,
+            next: None
+        }
+    }
+
+    fn insert(&mut self, element: Box<dyn Sound>) {
+        match self.next {
+            None => { self.next = Some(Box::new(FarmCell::new(element))) }
+            Some(ref mut next) => { next.insert(element) }
+        }
+    }
+}
+
+impl Sound for FarmCell {
+    fn make_sound(&self) -> String {
+        match self.next {
+            None => { self.element.make_sound() }
+            Some(ref next) => { self.element.make_sound() + next.make_sound().as_str() }
+        }
+    }
+}
+
+struct PublicStreetlight {
+    id: u32,
+    on: bool,
+    burnt: bool
+}
+
+struct PublicIllumination {
+    lights: Vec<PublicStreetlight>
+}
+
+#[allow(dead_code)]
+impl PublicStreetlight {
+    fn new(id: u32, on: bool, burnt: bool) -> Self {
+        Self {
+            id,
+            on,
+            burnt
+        }
+    }
+}
+
+impl Default for PublicStreetlight {
+    fn default() -> Self {
+        Self {
+            id: random::<u32>(),
+            on: random::<bool>(),
+            burnt: random::<bool>()
+        }
+    }
+}
+
+#[allow(dead_code)]
+impl PublicIllumination {
+    fn new(lights: Vec<PublicStreetlight>) -> Self {
+        Self { lights }
+    }
+}
+
+impl Default for PublicIllumination {
+    fn default() -> Self {
+        Self {
+            lights: vec![
+                PublicStreetlight::default(),
+                PublicStreetlight::default(),
+                PublicStreetlight::default()
+            ]
+        }
+    }
+}
+
+impl Iterator for PublicIllumination {
+    type Item = PublicStreetlight;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let index = self.lights.iter().position(|l| l.burnt);
+        return match index {
+            None => { None }
+            Some(i) => { Some(self.lights.remove(i)) }
+        }
+    }
+}
+
+use std::marker::PhantomData;
+trait CompileTimeNode{
+    type LeftType: CompileTimeNode;
+    type RightType: CompileTimeNode;
+    fn is_none() -> bool;
+}
+struct NullNode{}
+struct Node<L: CompileTimeNode, R: CompileTimeNode> {
+    left: PhantomData<L>,
+    right: PhantomData<R>
+}
+
+impl CompileTimeNode for NullNode {
+    type LeftType = NullNode;
+    type RightType = NullNode;
+
+    fn is_none() -> bool {
+        true
+    }
+}
+
+impl<L: CompileTimeNode, R: CompileTimeNode> CompileTimeNode for Node<L, R> {
+    type LeftType = L;
+    type RightType = R;
+
+    fn is_none() -> bool {
+        false
+    }
+}
+
+fn count_nodes<T: CompileTimeNode>() -> usize {
+    if T::is_none() {
+        return 0
+    } else {
+        return 1 + count_nodes::<T::LeftType>() + count_nodes::<T::RightType>();
+    }
+
+    // let mut count = 0;
+    // if !T::is_none(){
+    //     count = 1 + count_nodes::<T::LeftType>();
+    //     count = 1 + count_nodes::<T::RightType>();
+    // }
+    // count
+}
+
+#[derive(Debug)]
+struct EngangledBit {
+    bit: Rc<RefCell<u8>>
+}
+
+impl Default for EngangledBit {
+    fn default() -> Self {
+        Self { bit: Rc::new(RefCell::new(0)) }
+    }
+}
+
+impl EngangledBit {
+    fn set(&mut self) {
+        *self.bit.borrow_mut() = 1;
+    }
+
+    fn reset(&mut self) {
+        *self.bit.borrow_mut() = 0;
+    }
+
+    fn get(&self) -> bool {
+        return match *self.bit.borrow() {
+            0 => false,
+            1 => true,
+            _ => false,
+        }
+    }
+
+    fn entangle_with(&self, other: &mut Self) {
+        other.bit = Rc::clone(&self.bit);
+    }
+}
+
 fn main() {
     let str = "Ciao";
     //println!("{}", str);
@@ -1472,4 +1661,27 @@ fn main() {
     car_dealer.end_rental(&mut car_user);
     car_dealer.print_cars();
     car_user.print_car();
+
+    let cat = Box::new(Cat);
+    println!("{}", cat.make_sound());
+    let dog = Box::new(Dog);
+    let mut farm = FarmCell::new(cat);
+    farm.insert(dog);
+    println!("{}", farm.make_sound());
+
+    let lampioni = PublicIllumination::default();
+    for lampione in lampioni {
+        println!("{} {} {}", lampione.id, lampione.on, lampione.burnt);
+    }
+
+    let nodes = count_nodes::<Node<Node<Node<NullNode, NullNode>, NullNode>, Node<NullNode, NullNode>>>();
+    println!("{nodes}");
+
+    let mut b1 = EngangledBit::default();
+    let mut b2 = EngangledBit::default();
+
+    b1.entangle_with(&mut b2);
+    println!("{} - {}", b1.get(), b1.get());
+    b1.set();
+    println!("{} - {}", b1.get(), b2.get());
 }
