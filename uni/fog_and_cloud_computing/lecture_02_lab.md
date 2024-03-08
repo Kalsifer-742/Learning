@@ -1,13 +1,46 @@
-# Lab at home
+# Lecture 06/03/24
 
-First connection to VM
+## Repeatable and Portable Environments
 
-- set up password
-- generate ssh key, copy key to VM. check that it's all working.
-- Create an ssh tunnel to the vm.
+It works on my machine should only be a meme
 
-## SOCKS proxy
+- working in team
+- environment to your needs
+- isolate environments
+- easy automation (workflows)
+- productivity goes brrr
 
-The ssh tunnel support [SOCKS](https://en.wikipedia.org/wiki/SOCKS).
+### Tools
 
-Use SOCKS proxy to connect with the browser to a simple web server hosted in the VM.
+- Git
+- Vagrant
+  - repeatable environments. list of instructions. similar to ansible in concept
+  - relays on virtualbox
+- Virtualbox
+- Openssh
+
+## Vagrant
+
+takes as input a vagrant file, a description of the environment.
+
+Takes an image like docker
+
+Merge vagrant file and image to create what we want.
+
+To do that vagrant uses providers(virtualbox ecc...) and provisioners(shell scripts, ansible)
+
+vagrant obv is cli only.
+
+## Exercise 03 gitlab
+
+## Exercise 04 gitlab
+
+## Configuration management system: CM
+
+### Ansible
+
+Tools for configuration. Configuration in a human readable format. Declarative style.
+
+## Infrastructure as Code: IaC
+
+Look at how socks proxy works and tunnels ecc...
