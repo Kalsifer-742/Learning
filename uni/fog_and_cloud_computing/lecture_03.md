@@ -96,3 +96,149 @@ When it happens:
 - Hardware Interrupts
 
 ### System call implementation
+
+Application invokes system call:
+  - CPU traps to interrupt handler vector in OS
+  - CPU switch to kernel mode and execute instructions
+
+Hardware Event:
+- Hardware interrupt CPU execution and jump to interrupt handler in OS
+
+Traditional Way:
+- userland code generates software interrupt
+- generic interrupt routine of the OS is started. jump in the OS code to serve the above interrupt
+- kernel jumps to the requested code and then returns to the caller
+
+Modern Way:
+
+use of SYSENTER and SYSEXIT
+- userland code writes the register of the target kernel routine in a special address and then calls SYSENTER. Then the Kernel runs ina a very fast transition.
+
+## Trap and Emulate paradigm
+
+When guest OS launches a TRAP the VMM intercepts it and it emulates the effect of the priviledged instruction.
+
+What VMM do:
+- if trap is cause by application -> pass trap to the guest OS
+- if trap is caused by guest OS -> handle the trap adjusting the state of the VM
+
+All of this requires extra steps that can make system calls take very long. A lot of context switches.
+
+Slide 27-29 (Cloud Virtualizatio PDF) provide good explanatory pictures.
+
+### Problems
+
+x86 is not really virtualizabile
+
+- each privileged instruction has to genereate a time-consuming trap detectable by the hypervisor
+- x86 is very minimalistico. some sensitive instructions that are not privileged
+
+## Solutions
+
+- Binary translation
+  - No need to edit OS. Performance overhead. (VMWare, QEMU)
+- Paravirtualization
+  - Change the OS. Near native performance
+- Make all sensitive instructions privileged
+  - Hardware supported virtualization (Xen, KVM, VMWare)
+
+### Dynamic Binary Translation (DBT)
+
+- Dynamic: translation is done on the fly during execution
+- Binary: VMM translates the binary code
+
+Compatibility is great because id doesn't require any special modification to HW or SW
+
+Performance: pretty slow. big overhead. we can use caching to improve speed.
+
+### Hardware asssisted virtualization
+
+Solve problems of the other two methods.
+
+It's a trap end emulate paradigm support by hardware.
+
+Registers and address space swapped in a single
+atomic operation.
+
+CPU has a new running mode called VMX (Virtual machine eXtensions).
+New commands: VMENTRY and VMEXIT
+
+VMM runs in ring 0 aka root mode and the guest OS runs in non-root mode where the 4 ring structure is replicated. So guest OS runs in non-root ring 0 and guest OS applications in non-root ring 3.
+
+#### VMCS
+
+New memory structure, Virtual Machine Control Structure.
+
+Mirrors all register modifications needed for a certain configuration in the guest OS.
+
+It rapresentes the control panel of the VM storing:
+
+- Guest state
+- Host processor information
+- Control data, ex: trapping conditions
+
+#### Recap
+
+- Trasparent way to make Full virtualization.
+- no trap for system call triggered by user applications
+- reduced roundtrip time
+
+## Memory Virtualization
+
+Memory paging, MMU
+
+OS use virtual addresses:
+
+- addresses start at 0
+- OS use pages
+
+MMU (Memory managament unit)
+
+- translates virtual to physical addresses (in hardware)
+- manteins page table (big hash table)
+
+- TLB: (Translation lookaside buffer): cache of recently used page translations
+
+Virtual Memory:
+- Ease of use. Each process gets illussion of whole address space
+- Isolation
+- Optimization
+  - Fitting processes in memory
+
+### Shadow Page Table
+
+Guest virtual address -> Guest physical address -> Machine physical address
+
+To avoid a double translation: Shadow Page Table
+
+Guest logical address -> Machine physical pages
+
+This is invisible to the guest and it's used only by the cpu when the guest is active
+
+Slide 56 has a good visualization
+
+All of this cause an overhead of having to keep updated an additional table.
+Page faults are very expensive.
+
+In order to avoid Shadow Page Table overhead, Intel/AMD introduces Extended
+Page Table / Rapid Virtualisation Indexing
+
+So when we can we use hardware support: Both the traditional (guest) page tables and the nested page tables are exposed to the CPU. The hardware can do double-level page walk.
+
+The TLB becomes critical to mantein good performance.
+
+#### Tagged TLB
+
+Each TBL line has an ID (Virtual Processor ID)
+
+When a line has to be accessed we can check the ID to prevent wrong access.
+
+In this way multiple processor can coexist in the same TLB.
+
+Thi eliminates the need to flush the TLB at every VMEntry and VMExit
+
+## Summary
+
+- Shadow Page Table technique used only in absence of EPT/RVI support
+- EPT/RVI used whenever is possible
+  - Bigger pages could be used in order to limit the pressure on the TLB cache
