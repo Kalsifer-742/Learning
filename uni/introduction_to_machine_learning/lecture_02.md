@@ -104,9 +104,11 @@ Find the arguments/weights that minimize the distance from the prediction and th
 
 Typical errors: finding the local minimum and not the global minimum
 
-Overgeneralization explained in the slides ?
+Overgeneralization explained in the slides
 
 ### Mentions of
+
+Typical question at the exam
 
 - underfitting
 - overfitting
