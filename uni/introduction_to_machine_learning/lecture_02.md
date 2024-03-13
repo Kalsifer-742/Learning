@@ -106,6 +106,8 @@ Typical errors: finding the local minimum and not the global minimum
 
 Overgeneralization explained in the slides
 
+I divide by n in the formula because i'm interested in the mean. I want to reduce the error on average.
+
 ### Mentions of
 
 Typical question at the exam
