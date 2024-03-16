@@ -1,11 +1,3 @@
-# Lezione 23/3/22
-
-## Costruttori
-
-- costruttore di default
-- classi figlie devono invocare il costruttore del padre, questo può essere fatto con l'istruzione `super(...)` che deve essere la prima istruzione del costruttore della classe figlia
-- posso chiamare un altro costruttore della stessa classe mettendo come prima istruzione `this(...)`
-
 ## Polimorfismo
 
 - Principio di sostituzione di Liskov

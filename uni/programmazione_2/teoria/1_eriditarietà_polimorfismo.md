@@ -1,4 +1,4 @@
-# Lezione 22/03/22
+# Lezione
 
 - `this` per riferirmi ad attributi o metodi della mia classe o all`istanza
 
@@ -17,9 +17,30 @@
   - consiste nel redefinire i metodi della superclasse
 - `super`
   - é una pseudo variabile utilizzata per riferire metodi della superclasse
+  - risale tutta la gerarchia finchè non lo trova
 - costruttori
   - non vengono ereditati
-  - tramite `super` possono essere chiamati i costruttori della superclasse. Va messa come prima istruzioni. Se il programmatore non lo fa esplicitamente il compilatore inserisce del codice che chiama il costruttore di default (senza parametri) della superclasse.
+  - tramite `super` possono essere chiamati i costruttori della superclasse. Va messa come prima istruzioni.
+  - costruttore di default
+    - Se la classe definisce un costruttore con parametri non può essere creato un costruttore di default. Se il programmatore specifica un costruttore il linguaggio non introduce altro.
+  ```java
+  class A {
+    int x;
+
+    // A() {
+    //   this.x = 0;
+    // }
+    A(int x) {
+      this.x = x;
+    }
+  }
+
+  class B extends A {
+    B() { super(); } //il compilatore inserisce questa riga
+  }
+  ```
+  - ^^^ se il programmatore non specifica un costruttore per la sottoclasse il compilatore chiama il costruttore di default della superclasse.
+  Se il costruttore di default della superclasse non è definito il codice non può compilare.
 - UML
   - esiste
 - Overloading
@@ -28,34 +49,6 @@
 
 - overloading vs overriding
 	- a volte avviene uno a volte l'altro dipende dai casi e tipi statici e dinamici (guarda slide)
-
-- costruttore di default
-  - esiste e viene creato
-  - MA se la classe padre definisce un costruttore con parametri non può essere creato un costruttore di default. Se il programmatore specifica un costruttore il linguaggio non introduce altro
-```java
-class A {
-    int x;
-    int y;
-    A(int x, int y){
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class B extends A {
-    //il compilatore aggiunge ma A() non esiste e non viene creato perchè esiste già A(int x, int y)
-    /*
-    B(){
-        super();
-    }
-    */
-
-   //anche scrivendo non funzionerebbe perchè il compilatore trasforma in B(){super()}
-   //B(){}
-}
-
-//NON compila
-```
 
 - keyword
 	- final
