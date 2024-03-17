@@ -1,10 +1,12 @@
-# Java Vs C++
+# Java
 
 Vtable(Virtual Table) in memoria.
 
 Tabella associata ad ogni classe che contiene puntatori alle locazione di memoria dei metodi
 
 ![Alt text](resources/vtable_image.png)
+
+## Visibility
 
 ## Ereditarietà e Polimorfismo
 
