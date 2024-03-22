@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>unitn.prog2</groupId>
-    <artifactId>Minecraft2</artifactId>
+    <artifactId>minecraft_at_home</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Minecraft2</name>
 
@@ -60,7 +60,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>unitn.prog2.template/unitn.prog2.template.main</mainClass>
+                            <mainClass>unitn.prog2.template/unitn.prog2.minecraft2.main.main</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
