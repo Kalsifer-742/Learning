@@ -424,7 +424,7 @@ Group<Tourist> gt = ... //uso
 - Questa scelta mantiene compatibilità con API che non usano generics
   - ma genera una serie di limitazioni
 
-## Wildcard
+#### Wildcard
 
 - È possibile specificare una o più wildcard
   - Rappresentano un tipo non noto
@@ -440,7 +440,7 @@ Group<Tourist> gt = ... //uso
 
 ---
 
-## Limitazioni
+#### Limitazioni
 
 - Non posso fare array di generics
   - deriva sempre dall' implementazione
