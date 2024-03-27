@@ -1,32 +1,34 @@
 # Lecture 20/03/24
 
+## Clarification of some concepts
+
 ## Trapping
 
-lavora a livello di istruzione della cpu. guardo l'istruzione in quale ring vuole eseguire. non mi interessa se arriva dal sistema operativo o dall'applicazione.
+Both applications and operatin systems can cause traps. How do i distinguish them ? I don't.
+
+The machanism of trapping works at very low level. It reads the cpu instructions and in what ring it needs to execute.
 
 ## DBT
 
-traduco le sensitive instructions into privileged instructions. lo faccio a runtime.
+This mechanism translates the sensitive instructions into privileged instructions. This happens at runtime.
 
 ## Hardware assisted Virtualization
 
-new memory structure to define which instructions have to trap.
-
-it's normal trap and emulation but it's supported by hardware.
-
-doppio controllo: posso eseguire in questo ring ? posso eseguire in non root mode ?
-
-se la risposta è si capisco che non devo uscire dalla vm perché è un operazione che il guest os può eseguire autonomamente.
+- Introduces a new memory structure to define wich instructions have to trap. In this way things are much more flexible.
+- At a high level it's good old "trap and emulate" but this time with hardware support.
+- I can now avoid trapping if not necessary because I can figure out if the guest can perform the operation on it's own.
+    - I can 2 checks:
+        - Can i execute this operation in this ring ?
+        - Can i exectue this operation in non root mode ?
+    - If both answers are YES than i don't need to to a VMEXIT because it's an operation that the guest os can carry out by itself.
 
 ## Memory Virtualization
 
-la shadow table rimane aggiornata grazie ai page faults.
-un page fault genera un trap che mi permette di tenere aggiornati i mappings.
+I manage to keep the Shadow Table updated thaks to page faults.
+A page fault generates a trap that allow me to updates the mapping in the shadow table.
 
-nested lookaside buffer. double walk but in hardware.
 
-flush della tlb ogni VMEXIT e VMENTRY.
+**Intel/AMD introduces Extended Page Table / Rapid Virtualisation Indexing**
+- I have 2 nested page table: one for the VM and one for the machine. I need to do a double walk but it's in hardware so it's really fast.
 
-TLB con tag per evitare i flush.
-
-TLB shadow table in hardware.
+Usually I would need to flush the TLB at every VMEXIT and VMENTRY. Hardware assisted Virtualization introduces tags to the TLB entries so I don't have to flush everything everytime.

@@ -2,4 +2,4 @@
 
 Opens stack introduction with slides and then exercises.
 
-Images speaks more than words. To review look at Lab02 Slides
+Images speaks more than words. To review look at Lab02 Slides.

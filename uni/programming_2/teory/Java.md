@@ -24,6 +24,7 @@ Tabella associata ad ogni classe che contiene puntatori alle locazione di memori
 - `super`
   - é una pseudo variabile utilizzata per riferire metodi della superclasse
   - risale tutta la gerarchia finchè non lo trova
+  - un metodo `static` deve essere overridato da un'altro metodo `static`
 - costruttori
   - non vengono ereditati
   - tramite `super` possono essere chiamati i costruttori della superclasse. Va messa come prima istruzioni.
@@ -60,12 +61,13 @@ Tabella associata ad ogni classe che contiene puntatori alle locazione di memori
 
 - keyword
   - final
-    - definisce una classe o un metodo come non più modificabile (o una variabile)
+    - definisce una classe o un metodo come non più modificabile (o una variabile). disattiva il dynamic dispatch
   - private
     - visibile solo internamente alla classe
   - protected
     - visibile solo dalle classi dello stesso package e dalle sottoclassi
   - `this` per riferirmi ad attributi o metodi della mia classe o all`istanza
+  - `static` crea metodi e variabili della classe che possono essere usati anche senza instanziare un'oggetto. sono gli stessi per l'intera classe. stessa area di memoria
 
 ## Classi astratte
 
@@ -99,11 +101,12 @@ Tabella associata ad ogni classe che contiene puntatori alle locazione di memori
       - in caso di overriding la specifica implementazione del metodo la cui firma è stata scelta a compiletime viene determinata a runtime basandosi sul tipo dinamico
     - regola per il binding
       - > il metodo scelto dipende dal tipo dinamico (new ...()) e viene deciso a runtime in questo modo:
-    -Si cerca il metodo all'interno della classe del tipo statico
-    -Si controlla se il tipo dinamico è una sottoclasse del tipo statico
-    -Se è un sottotipo si controlla se è definito un override
-    -Se la risposta è si si utilizza l'implementazione della sottoclasse, altrimenti quella della classe padre
-    - il tipo statico determina quali metodi possono essere invocati. il tipo dinamico determina quale (ri)definizione eseguire
+        - Si cerca il metodo all'interno della classe del tipo statico
+        - Si controlla se il tipo dinamico è una sottoclasse del tipo statico
+        - Se è un sottotipo si controlla se è definito un override
+        - Se la risposta è si si utilizza l'implementazione della sottoclasse, altrimenti quella della classe padre
+        - il tipo statico determina quali metodi possono essere invocati. il tipo dinamico determina quale (ri)definizione eseguire
+    - > reminder che il dinamic binding non è una cosa che avviene durante la compilazione. Bisogna ricordarsi quali metodi possono essere effettivamente eseguiti.
   - late binding
   - lazy evaluation
 
@@ -117,6 +120,8 @@ Tabella associata ad ogni classe che contiene puntatori alle locazione di memori
 
 - static
 	- rende il binding statico
+
+> non c'è dynamic binding sui metodi statici
 
 ## Casting
 
@@ -165,6 +170,12 @@ finally
     anticipated.
 */
 ```
+
+## Interfacce
+
+dai ora sai i traits
+
+in java puoi usare le interfacce come tipo statico. (parallelismo con i trait objects???)
 
 ## Collections
 
@@ -413,7 +424,7 @@ Group<Tourist> gt = ... //uso
 - Questa scelta mantiene compatibilità con API che non usano generics
   - ma genera una serie di limitazioni
 
-## Wildcard
+#### Wildcard
 
 - È possibile specificare una o più wildcard
   - Rappresentano un tipo non noto
@@ -429,7 +440,7 @@ Group<Tourist> gt = ... //uso
 
 ---
 
-## Limitazioni
+#### Limitazioni
 
 - Non posso fare array di generics
   - deriva sempre dall' implementazione
