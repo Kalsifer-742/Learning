@@ -404,7 +404,7 @@ c.setOnMouseEntered(new EventHandler<MouseEvent>() {
 - evitiamo cast espliciti che possono creare errori ed evitiamo che si inseriscano oggetti del tipo che non ci interessano in una lista per esempio
 
 ```java
-class Group<T> { ... //definizione
+class Group<T> { ... } //definizione
 Group<Student> gs = ... //uso
 Group<Tourist> gt = ... //uso
 ```
@@ -437,6 +437,9 @@ Group<Tourist> gt = ... //uso
     - `Group<? extends Persona & Comparable> g = new Group<Student>(); //studente implementa Comparable`
   - È possibile «limitare» le wildcard anche verso le superclassi
     - `Group<? super Studente> g = new Group<Persona>();`
+    - anche Studente va bene. penso significhe quella classe e tutte quelle superiori
+
+wildcard è utile da utilizzare per i parametri dei metodi più che altro
 
 ---
 
@@ -464,6 +467,8 @@ obj instanceof List<? super Number> //error
 ## Extras
 
 - dentro le lamba attraverso this posso solo riferirmi all'oggetto che la usa
+
+- Parametricity
 
 ## Clonazione
 
