@@ -24,11 +24,17 @@ This mechanism translates the sensitive instructions into privileged instruction
 
 ## Memory Virtualization
 
+The VMM can partecipate in writing entries into the TLB.
+In this way translations saved in the Shadow Paga Table can be cached in the TLB.
+
 I manage to keep the Shadow Table updated thaks to page faults.
 A page fault generates a trap that allow me to updates the mapping in the shadow table.
 
-
 **Intel/AMD introduces Extended Page Table / Rapid Virtualisation Indexing**
-- I have 2 nested page table: one for the VM and one for the machine. I need to do a double walk but it's in hardware so it's really fast.
+
+I have 2 nested page table: one for the VM and one for the machine. I need to do a double walk but it's in hardware so it's really fast.
+
+The TLB works as a cache for the logical to physical page translations.
+It can also cache translations for the guest OS because I flush it at every context switch. So the translations always refer to something meaningful.
 
 Usually I would need to flush the TLB at every VMEXIT and VMENTRY. Hardware assisted Virtualization introduces tags to the TLB entries so I don't have to flush everything everytime.

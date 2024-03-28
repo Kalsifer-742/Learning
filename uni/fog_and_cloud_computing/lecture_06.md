@@ -1,55 +1,66 @@
 # Lecture 27/03/24
 
-fatti una nota sulla cosa delle page table. la tlb prima della modalità tagged funziona perchè ogni volta con il context switch la svuoti. quindi ha sempre senso quello che c'è scritto.
-
 ## I/O Virtualization
 
-3 ways to do it:
-
-- device emulation
+- Device emulation
   - multiple vm can be on the same network interface. The VMM emulate stuff in some ways internally.
-- para-virtualized device
-  - the same as OS system customization
-- direct assignment
+- Para-virtualized device
+- Direct assignment
 
 ### Device Emulation
 
-Traps everytime the VM tries to access it
+It's similar to Full Virtualisation for the CPU.
+- The VMM traps everytime the guest OS tries to access the peripheral.
+- Easy for the user but pretty slow.
+- The VMM can expose whatever driver it wants.
 
-the VMM can expose whatever driver it wants
+## Para Virtualization
 
-easy for the user but pretty slow
+It's the same as Paravirtualisation for the CPU. In this mode we have less context switches.
 
-## para virtualization
+It allows the process of memory ballonning. With this method the VMM is able allocate only the memory that it is actually used by the guest and in need increase the amount of memory reserved to that guest.
 
-memory ballooning, guarda slides
+### Direct assignment
 
-### direct assignment
+Example: PCI passthrough.
 
-PCI passthrough
+#### IOMMU
 
-IOMMU to address the problem of hardware device address translation
+Basically it's a MMU but for IO.
+It's needed because when using DMA we have to translate from guest-physical address to host-physical address.
 
-SR-IOV: pci standard to create virtual devices. useful for network cards. look at the slides
+#### SR-IOV
+
+PCI standard that enables multiplexing of a single device between multiple VMS (It doesn't work for everything).
+It enables the device to present multiple virtual devices.
+Example: Network card shared among 2 VMS
 
 ## Hypervisor
 
-- on bare metal
+- Type 1
+  - Bare metal.
+  - You need the correct drivers.
+  - It's a stripped down OS.
+- Type 2
+  - Run as a normal application on the Host.
+  - Virtualbox
+- Hybrid
+  - Hypervisor implemented in the host kernel. It runs alongside the host OS.
+  - Drivers are provided by the mainstream OS
+  - KVM
 
 ## Lightweight Virtualization
 
-docker
+### How ?
 
-how do we do it ?
+- Linux cgroups
+  - Limit and isolate and/or deny resources to a process or a group of processes. Example: limit the cpu quota
+  - They also give you accounting. Useful to see how many resources are used by a specific group
+- Linux namespaces
+  - similar in concept to cgroups.
+  But the focus is on isolation, managing what a process can see.
+  Example: network namespace.
 
-Linux cgroups:
+### Docker
 
-limit and isolate or deny resources to a process or a group of processes
-
-- example cpu quota
-
-they also give you accounting. like to see how many resources are used by a specific groups
-
-Linux namespaces:
-
-similar to cgroups. more focused on creating isolation and restrict what a process can see
+...
